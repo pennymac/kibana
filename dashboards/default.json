@@ -221,6 +221,7 @@
           "overflow": "min-height",
           "fields": [
             "@fields.syslog_timestamp",
+            "@fields.syslog_hostname",
             "@message"
           ],
           "highlight": [],
