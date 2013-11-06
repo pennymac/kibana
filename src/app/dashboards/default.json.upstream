@@ -28,7 +28,7 @@
         "0": {
           "type": "time",
           "field": "@timestamp",
-          "from": "now-24h",
+          "from": "now-15m",
           "to": "now",
           "mandate": "must",
           "active": true,
@@ -61,7 +61,7 @@
           "value_field": null,
           "auto_int": true,
           "resolution": 100,
-          "interval": "10m",
+          "interval": "10s",
           "fill": 3,
           "linewidth": 3,
           "timezone": "browser",
@@ -159,7 +159,7 @@
               0
             ]
           },
-          "field_list": true,
+          "field_list": false,
           "status": "Stable",
           "trimFactor": 300,
           "normTimes": true,
@@ -192,7 +192,7 @@
     {
       "type": "filtering",
       "collapse": true,
-      "notice": false,
+      "notice": true,
       "enable": true
     }
   ],
@@ -245,5 +245,5 @@
     "load_local": true,
     "hide": false
   },
-  "refresh": false
+  "refresh": "5s"
 }
