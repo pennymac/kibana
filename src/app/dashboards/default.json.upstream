@@ -1,5 +1,5 @@
 {
-  "title": "Logstash Search",
+  "title": "Home",
   "services": {
     "query": {
       "idQueue": [
@@ -50,120 +50,16 @@
       "collapsable": true,
       "panels": [
         {
-          "span": 12,
-          "editable": true,
-          "group": [
-            "default"
-          ],
-          "type": "histogram",
-          "mode": "count",
-          "time_field": "@timestamp",
-          "value_field": null,
-          "auto_int": true,
-          "resolution": 100,
-          "interval": "10s",
-          "fill": 3,
-          "linewidth": 3,
-          "timezone": "browser",
-          "spyable": true,
-          "zoomlinks": true,
-          "bars": true,
-          "stack": true,
-          "points": false,
-          "lines": false,
-          "legend": true,
-          "x-axis": true,
-          "y-axis": true,
-          "percentage": false,
-          "interactive": true,
-          "queries": {
-            "mode": "all",
-            "ids": [
-              0
-            ]
-          },
-          "title": "Events over time",
-          "intervals": [
-            "auto",
-            "1s",
-            "1m",
-            "5m",
-            "10m",
-            "30m",
-            "1h",
-            "3h",
-            "12h",
-            "1d",
-            "1w",
-            "1M",
-            "1y"
-          ],
-          "options": true,
-          "tooltip": {
-            "value_type": "cumulative",
-            "query_as_alias": true
-          },
-          "show_query": true,
-          "legend_counts": true,
-          "zerofill": true,
-          "derivative": false,
-          "scale": 1,
-          "grid": {
-            "max": null,
-            "min": 0
-          }
-        }
-      ],
-      "notice": false
-    },
-    {
-      "title": "Events",
-      "height": "350px",
-      "editable": true,
-      "collapse": false,
-      "collapsable": true,
-      "panels": [
-        {
-          "title": "All events",
           "error": false,
           "span": 12,
           "editable": true,
-          "group": [
-            "default"
-          ],
-          "type": "table",
-          "size": 100,
-          "pages": 5,
-          "offset": 0,
-          "sort": [
-            "@timestamp",
-            "desc"
-          ],
-          "style": {
-            "font-size": "9pt"
-          },
-          "overflow": "min-height",
-          "fields": [
-            "@fields.syslog_timestamp",
-            "@fields.syslog_hostname",
-            "@fields.syslog_message"
-          ],
-          "highlight": [],
-          "sortable": true,
-          "header": true,
-          "paging": true,
-          "spyable": true,
-          "queries": {
-            "mode": "all",
-            "ids": [
-              0
-            ]
-          },
-          "field_list": false,
+          "type": "text",
+          "loadingEditor": false,
           "status": "Stable",
-          "trimFactor": 300,
-          "normTimes": true,
-          "all_fields": false
+          "mode": "html",
+          "content": "<H1>Logstash</H1>\n<H2>Please select a dashboard from the load icon in the top right corner</H2>",
+          "style": {},
+          "title": ""
         }
       ],
       "notice": false
@@ -172,16 +68,16 @@
   "editable": true,
   "failover": false,
   "index": {
-    "interval": "day",
-    "pattern": "[logstash-]YYYY.MM.DD",
-    "default": "NO_TIME_FILTER_OR_INDEX_PATTERN_NOT_MATCHED"
+    "interval": "none",
+    "pattern": "kibana-int",
+    "default": "pentaho"
   },
   "style": "light",
   "panel_hints": true,
   "pulldowns": [
     {
       "type": "query",
-      "collapse": false,
+      "collapse": true,
       "notice": false,
       "query": "*",
       "pinned": true,
