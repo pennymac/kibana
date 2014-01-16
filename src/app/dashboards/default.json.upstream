@@ -68,8 +68,8 @@
   "editable": true,
   "failover": false,
   "index": {
-    "interval": "none",
-    "pattern": "kibana-int",
+    "interval": "day",
+    "pattern": "[pentaho-]YYYY.MM.DD",
     "default": "pentaho"
   },
   "style": "light",
