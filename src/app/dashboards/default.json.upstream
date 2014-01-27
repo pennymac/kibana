@@ -69,7 +69,7 @@
   "failover": false,
   "index": {
     "interval": "day",
-    "pattern": "[pentaho-]YYYY.MM.DD",
+    "pattern": "[pentaho-]YYYY.MM",
     "default": "pentaho"
   },
   "style": "light",
