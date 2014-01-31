@@ -1,6 +1,6 @@
 define([
   'angular',
-  'underscore',
+  'lodash',
   'config',
   'kbn'
 ],
@@ -9,12 +9,14 @@ function (angular, _, config, kbn) {
 
   var module = angular.module('kibana.services');
 
-  module.service('querySrv', function(dashboard, ejsResource, filterSrv, $q) {
+  module.service('querySrv', function(dashboard, ejsResource, filterSrv, esVersion, $q) {
+
+    // Save a reference to this
+    var self = this;
 
     // Create an object to hold our service state on the dashboard
     dashboard.current.services.query = dashboard.current.services.query || {};
     _.defaults(dashboard.current.services.query,{
-      idQueue : [],
       list : {},
       ids : [],
     });
@@ -31,7 +33,6 @@ function (angular, _, config, kbn) {
 
     // For convenience
     var ejs = ejsResource(config.elasticsearch);
-    var _q = dashboard.current.services.query;
 
     // Holds all actual queries, including all resolved abstract queries
     var resolvedQueries = [];
@@ -73,7 +74,7 @@ function (angular, _, config, kbn) {
         }
       },
       regex: {
-        require:">=0.90.3",
+        require:">=0.90.12",
         icon: "icon-circle",
         resolve: function(query) {
           // Simply returns itself
@@ -106,13 +107,14 @@ function (angular, _, config, kbn) {
                   )))).size(0);
 
           var results = request.doSearch();
+          // Like the regex and lucene queries, this returns a promise
           return results.then(function(data) {
             var _colors = kbn.colorSteps(q.color,data.facets.query.terms.length);
             var i = -1;
             return _.map(data.facets.query.terms,function(t) {
               ++i;
               return self.defaults({
-                query  : q.field+':"'+t.term+'"'+suffix,
+                query  : q.field+':"'+kbn.addslashes('' + t.term)+'"'+suffix,
                 alias  : t.term + (q.alias ? " ("+q.alias+")" : ""),
                 type   : 'lucene',
                 color  : _colors[i],
@@ -124,14 +126,21 @@ function (angular, _, config, kbn) {
       }
     };
 
-    // Save a reference to this
-    var self = this;
+    self.types = [];
+    _.each(self.queryTypes,function(type,name){
+      esVersion.is(type.require).then(function(is) {
+        if(is) {
+          self.types.push(name);
+        }
+      });
+    });
 
     this.init = function() {
-      _q = dashboard.current.services.query;
-
       self.list = dashboard.current.services.query.list;
       self.ids = dashboard.current.services.query.ids;
+
+      self.ids = dashboard.current.services.query.ids =
+        _.intersection(_.map(self.list,function(v,k){return parseInt(k,10);}),self.ids);
 
       // Check each query object, populate its defaults
       _.each(self.list,function(query) {
@@ -143,7 +152,8 @@ function (angular, _, config, kbn) {
       }
     };
 
-    // This is used both for adding queries and modifying them. If an id is passed, the query at that id is updated
+    // This is used both for adding queries and modifying them. If an id is passed,
+    // the query at that id is updated
     this.set = function(query,id) {
       if(!_.isUndefined(id)) {
         if(!_.isUndefined(self.list[id])) {
@@ -167,6 +177,7 @@ function (angular, _, config, kbn) {
     this.defaults = function(query) {
       _.defaults(query,_query);
       _.defaults(query,_dTypes[query.type]);
+      query.color = query.color || colorAt(query.id);
       return query;
     };
 
@@ -175,18 +186,14 @@ function (angular, _, config, kbn) {
         delete self.list[id];
         // This must happen on the full path also since _.without returns a copy
         self.ids = dashboard.current.services.query.ids = _.without(self.ids,id);
-        _q.idQueue.unshift(id);
-        _q.idQueue.sort(function(v,k){
-          return v-k;
-        });
         return true;
       } else {
         return false;
       }
     };
 
-    // In the case of a compound query, such as a derived query, we'd need to
-    // return an array of elasticJS objects. Not sure if that is appropriate?
+
+    // These are the only query types that can be returned by a compound query.
     this.toEjsObj = function (q) {
       switch(q.type)
       {
@@ -245,10 +252,16 @@ function (angular, _, config, kbn) {
     };
 
     var nextId = function() {
-      if(_q.idQueue.length > 0) {
-        return _q.idQueue.shift();
+      var idCount = dashboard.current.services.query.ids.length;
+      if(idCount > 0) {
+        // Make a sorted copy of the ids array
+        var ids = _.sortBy(_.clone(dashboard.current.services.query.ids),function(num){
+          return num;
+        });
+        return kbn.smallestMissing(ids);
       } else {
-        return self.ids.length;
+        // No ids currently in list
+        return 0;
       }
     };
 
